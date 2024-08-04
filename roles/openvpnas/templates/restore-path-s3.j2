@@ -1,0 +1,36 @@
+#!/bin/bash
+set -eEuo pipefail
+
+script_dir=$(dirname "$(realpath "$0")")
+echo "change to working directory: $script_dir"
+cd $script_dir
+
+### Check if a directory does not exist ###
+output=$(aws s3api head-object --bucket {{ openvpn_backup_bucket }} --key {{ openvpn_backup_relative_path }}/{{ openvpn_backup_filename }} || true)
+if [ -z "$output" ]; then
+  echo "it does not exist"
+  exit 0
+else
+  echo "it exists"
+fi
+
+aws s3 cp {{ openvpn_backup_s3_path }}/{{ openvpn_backup_filename }} . --region {{ ec2_instance.region }}
+
+###/tmp/ansible-openvpn/ansible-vault decrypt /usr/local/openvpn_as/*.bak --vault-password-file vault-password
+
+gpg --batch --output db.zip --passphrase-file vault-password --decrypt {{ openvpn_backup_filename }}
+unzip -o db.zip -d /
+rm db.zip {{ openvpn_backup_filename }}
+
+# restore script
+cd /usr/local/openvpn_as/etc/db
+
+[ -e ../../config.db.bak ]&&rm config.db;sqlite3<../../config.db.bak config.db
+[ -e ../../certs.db.bak ]&&rm certs.db;sqlite3 <../../certs.db.bak certs.db
+[ -e ../../userprop.db.bak ]&&rm userprop.db;sqlite3 <../../userprop.db.bak userprop.db
+[ -e ../../log.db.bak ]&&rm log.db;sqlite3 <../../log.db.bak log.db
+[ -e ../../config_local.db.bak ]&&rm config_local.db;sqlite3 <../../config_local.db.bak config_local.db
+[ -e ../../cluster.db.bak ]&&rm cluster.db;sqlite3 <../../cluster.db.bak cluster.db
+###[ -e ../../clusterdb.db.bak ]&&rm clusterdb.db;sqlite3 <../../clusterdb.db.bak clusterdb.db
+[ -e ../../notification.db.bak ]&&rm notification.db;sqlite3 <../../notification.db.bak notification.db
+[ -e ../../as.conf.bak ]&&cp ../../as.conf.bak ../as.conf

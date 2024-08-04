@@ -1,0 +1,26 @@
+#!/bin/bash
+
+DIR=$PWD
+
+cd /usr/local/openvpn_as/etc/db
+[ -e config.db ]&&sqlite3 config.db .dump>../../config.db.bak
+[ -e certs.db ]&&sqlite3 certs.db .dump>../../certs.db.bak
+[ -e userprop.db ]&&sqlite3 userprop.db .dump>../../userprop.db.bak
+[ -e log.db ]&&sqlite3 log.db .dump>../../log.db.bak
+[ -e config_local.db ]&&sqlite3 config_local.db .dump>../../config_local.db.bak
+[ -e cluster.db ]&&sqlite3 cluster.db .dump>../../cluster.db.bak
+##[ -e clusterdb.db ]&&sqlite3 clusterdb.db .dump>../../clusterdb.db.bak
+[ -e notification.db ]&&sqlite3 notification.db .dump>../../notification.db.bak
+cp ../as.conf ../../as.conf.bak
+
+###/tmp/ansible-openvpn/ansible-vault encrypt /usr/local/openvpn_as/*.bak --vault-password-file /opt/backup/vault-password
+
+zip "$DIR/db.zip" /usr/local/openvpn_as/*.bak
+gpg --batch --output $DIR/{{ openvpn_backup_filename }} --passphrase-file $DIR/vault-password --symmetric $DIR/db.zip
+###rm db.zip {{ openvpn_backup_filename }}
+
+aws s3 cp "$DIR/{{ openvpn_backup_filename }}" {{openvpn_backup_s3_path}}/ --region {{ec2_instance.region}}
+
+cd $DIR
+
+rm db.zip {{ openvpn_backup_filename }}

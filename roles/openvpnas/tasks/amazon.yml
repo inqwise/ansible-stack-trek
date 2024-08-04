@@ -1,0 +1,55 @@
+---
+# tasks file for openvpn_as (Amazon Linux 2 specific)
+
+- name: Ensure a temporary directory for download exists
+  tempfile:
+    state: directory
+    suffix: download
+  register: temp_dir
+  tags: installation
+
+- name: check RPM exist in local cache
+  stat:
+    path: "{{ temp_dir.path }}/openvpn-yum-repository.rpm"
+  register: openvpn_repository_install
+  tags: installation
+
+- name: download RPM from http
+  get_url:
+    dest: "{{ temp_dir.path }}/openvpn-yum-repository.rpm"
+    url: "{{ openvpn_yum_repository_url }}"
+    validate_certs: no
+    force: no
+  when: openvpn_repository_install.stat.exists == False and openvpn_yum_repository_url.startswith('http')
+  tags: installation
+
+- name: download RPM from s3
+  command: "aws s3 cp {{ openvpn_yum_repository_url }} {{ temp_dir.path }}/openvpn-yum-repository.rpm"
+  when: openvpn_repository_install.stat.exists == False and openvpn_yum_repository_url.startswith('s3')
+  tags: installation
+
+- name: install openvpn Repository
+  ansible.builtin.package:
+    name:
+      - "{{ temp_dir.path }}/openvpn-yum-repository.rpm"
+    state: present
+  tags: installation
+
+- name: Install OpenVPN and dependencies
+  ansible.builtin.package:
+    name:
+      - 'openvpn-as'
+      - 'sqlite'
+    state: present
+  tags: installation
+
+# - name: Remove previously installed OpenVPN repository
+#   yum:
+#     name: openvpn-as-yum
+#     state: absent
+
+# - name: Install OpenVPN repository
+#   yum:
+#     name:
+#       - 'https://as-repository.openvpn.net/as-repo-amzn2.rpm'
+#     state: present

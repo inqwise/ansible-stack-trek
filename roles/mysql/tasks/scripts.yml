@@ -1,0 +1,10 @@
+---
+
+- name: process scripts
+  ansible.builtin.include_tasks: script.yml
+  loop: "{{ lookup('fileglob', 'files/scripts/*', wantlist=True) | sort }}"
+  loop_control:
+    label: "process {{ mysql_script }} script"
+  vars:
+    mysql_script: "{{ item }}"
+  tags: configuration

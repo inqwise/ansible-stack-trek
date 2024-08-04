@@ -1,0 +1,26 @@
+---
+- name: copy vault-password file
+  template:
+    src: vault-password.j2
+    dest: /opt/backup/vault-password
+  tags: configuration
+
+- name: copy restore script
+  template:
+    src: restore-path-s3.j2
+    dest: /opt/backup/openvpn-restore.sh
+    mode: '100770'
+  tags: configuration
+
+- name: run restore script
+  shell:
+    cmd: /opt/backup/openvpn-restore.sh
+  notify:
+    - update db
+    - restart openvpn_as
+  tags: configuration
+
+# - name: remove restore script
+#   ansible.builtin.file:
+#     path: /opt/backup/openvpn-restore.sh
+#     state: absent

@@ -1,0 +1,59 @@
+---
+
+- name: 'apply configuration'
+  template: src='my.cnf.j2' dest='/etc/my.cnf' owner='root' group='root' mode=644
+  register: mycnf
+  tags: installation
+
+- name: 'how many times has rebooted'
+  shell: 'last reboot | grep -w "reboot" | wc -l'
+  register: reg_reboot_counter
+  tags: installation
+
+- debug: var=reg_reboot_counter
+  tags: debug
+
+- name: Run mysqld
+  service:
+    name: 'mysqld'
+    state: restarted
+    enabled: yes
+  when: reg_reboot_counter.stdout|int == 1
+  tags: configuration
+  
+- name: get root password
+  shell: "grep 'A temporary password is generated for root@localhost' /var/log/mysqld.log | awk -F ' ' '{print $(NF)}'"
+  register: tmp_root_password
+  ignore_errors: true
+  tags: installation
+
+- name: debug tmp_root_password
+  debug:
+    var: tmp_root_password
+  tags: debug
+
+- name: debug temporal mysql password
+  debug:
+    var: tmp_root_password
+  when: tmp_root_password.stdout != ""
+  tags: debug
+
+- name: update expired root user password
+  command: "mysql --user root --password={{ tmp_root_password.stdout }} --connect-expired-password --execute=\"ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mysql.root_password }}'; UPDATE mysql.user SET Host='%' WHERE Host='localhost' AND User='root';\""
+  when: tmp_root_password.stdout != ""
+  no_log: true
+  tags: installation
+
+- name: delete /var/log/mysqld.log
+  file: 
+    path: /var/log/mysqld.log
+    state: absent
+  when: tmp_root_password.stdout != ""
+  tags: configuration
+
+- name: 'Restart mysqld service'
+  service:
+    name: mysqld 
+    state: restarted
+  when: tmp_root_password.stdout != ""
+  tags: configuration

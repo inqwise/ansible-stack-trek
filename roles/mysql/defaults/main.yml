@@ -1,0 +1,2 @@
+default_mysql_gpg_public_key_url: https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
+default_mysql_yum_repository_url: https://repo.mysql.com/mysql80-community-release-el9-5.noarch.rpm

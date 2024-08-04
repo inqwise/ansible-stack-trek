@@ -1,0 +1,19 @@
+---
+- name: copy backup script
+  template:
+    src: backup-path-s3.j2
+    dest: /opt/backup/openvpn-backup.sh
+    mode: '100770'
+  tags: configuration
+
+- name: cronjob for openvpn backup
+  ansible.builtin.cron:
+    name: openvpn backup
+    state: present
+    minute: "0"
+    hour: "*/1"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    job: "/opt/backup/openvpn-backup.sh"
+  tags: configuration
