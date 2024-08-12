@@ -1,0 +1,31 @@
+---
+# tasks file for consul
+- name: consul_install
+  debug: var=consul_install
+
+- name: consul_deploy
+  debug: var=consul_deploy
+
+- name: consul_reverse_addr
+  debug: var=ansible_eth0['ipv4']['address'].split('.')[1]+'.'+ansible_eth0['ipv4']['address'].split('.')[0]+'.in-addr.arpa'
+
+- include_role:
+    name: dnsmasq
+  vars:
+    dnsmasq_install: "{{ consul_install|default(True) }}"
+    dnsmasq_deploy: "{{ consul_deploy|default(True) }}"
+    dnsmasq_group: root
+    dnsmasq_servers:
+      - domain: consul
+        nameserver: "127.0.0.1#{{ consul_ports_dns }}"
+      - domain: "{{ consul_reverse_addr | default(ansible_eth0['ipv4']['address'].split('.')[1]+'.'+ansible_eth0['ipv4']['address'].split('.')[0]+'.in-addr.arpa') }}"
+        nameserver: "127.0.0.1#{{ consul_ports_dns }}"
+  when: not consul_server
+
+- name: "Install"
+  include_tasks: "install.yml"
+  when: consul_install|default(True)
+
+- name: "Deploy"
+  include_tasks: "deploy.yml"
+  when: consul_deploy|default(True)
