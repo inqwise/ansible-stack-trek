@@ -68,7 +68,7 @@ openvpn_as_vpn_server_dhcp_option_domains: []
 openvpn_as_vpn_server_duplicate_cn: true
 openvpn_as_vpn_server_google_auth_enable: false
 openvpn_as_vpn_server_group_pool:
-  - "{{ '.'.join(private_ip[:2]) }}.0.0/16"
+  - 172.27.240.0/20
 openvpn_as_vpn_server_routing_allow_private_nets_to_clients: true
 openvpn_as_vpn_server_routing_gateway_access: true
 openvpn_as_vpn_server_routing_private_access: nat
@@ -86,3 +86,5 @@ openvpn_yum_repository_url: https://as-repository.openvpn.net/as-repo-amzn2.rpm
 
 openvpn_backup_s3_path: "s3://{{ openvpn_backup_bucket }}/{{ openvpn_backup_relative_path }}"
 openvpn_backup_filename: db.zip.gpg
+
+openvpn_service_start_and_enable: "{{ ansible_run_tags | length == 0 or 'configuration' in ansible_run_tags }}"

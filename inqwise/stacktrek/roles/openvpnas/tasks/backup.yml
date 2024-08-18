@@ -4,7 +4,7 @@
     src: backup-path-s3.j2
     dest: /opt/backup/openvpn-backup.sh
     mode: '100770'
-  tags: configuration
+  tags: installation
 
 - name: cronjob for openvpn backup
   ansible.builtin.cron:

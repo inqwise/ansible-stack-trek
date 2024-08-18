@@ -2,9 +2,7 @@
 # tasks file for openvpn_as
 - include_tasks: amazon.yml
   when: ansible_distribution == "Amazon"
-  tags:
-    - openvpn_as
-    - configuration
+  tags: installation
 
 - name: Set password for openvpn user
   user:
@@ -16,9 +14,7 @@
     update_password: always
     system: yes
     state: present
-  tags:
-    - openvpn_as
-    - configuration
+  tags: installation
 
 - name: Template OpenVPN Access Server main configuration
   template:
@@ -29,9 +25,7 @@
     mode: 0644
   notify:
     - restart openvpn_as
-  tags:
-    - openvpn_as
-    - configuration
+  tags: configuration
 
 - name: Configure OpenVPN Access Server
   template:
@@ -44,18 +38,17 @@
   notify:
     - update db
     - restart openvpn_as
-  tags:
-    - openvpn_as
-    - configuration
+  tags: configuration
 
 - name: create backup folder
   file:
     path: '/opt/backup'
     mode: '41774'
     state: directory
-  tags: configuration
+  tags: installation
 
 - include_tasks: restore.yml
+  tags: ['configuration','installation']
 
 - name: Ensure OpenVPN Access Server service is started and enabled on boot
   service:
@@ -63,8 +56,7 @@
     enabled: yes
     pattern: "{{ openvpn_as_service_name }}"
     state: started
-  tags:
-    - openvpn_as
-    - configuration
+  tags: configuration
 
 - include_tasks: backup.yml
+  tags: ['configuration','installation']

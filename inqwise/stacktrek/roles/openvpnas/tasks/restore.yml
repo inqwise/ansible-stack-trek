@@ -10,7 +10,7 @@
     src: restore-path-s3.j2
     dest: /opt/backup/openvpn-restore.sh
     mode: '100770'
-  tags: configuration
+  tags: installation
 
 - name: run restore script
   shell:
@@ -19,8 +19,3 @@
     - update db
     - restart openvpn_as
   tags: configuration
-
-# - name: remove restore script
-#   ansible.builtin.file:
-#     path: /opt/backup/openvpn-restore.sh
-#     state: absent
