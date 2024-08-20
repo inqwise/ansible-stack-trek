@@ -1,6 +1,7 @@
 #!/bin/bash
+set -euo pipefail
 
-DIR=$PWD
+DIR=$(dirname "$0")
 
 cd /usr/local/openvpn_as/etc/db
 [ -e config.db ]&&sqlite3 config.db .dump>../../config.db.bak
@@ -13,11 +14,8 @@ cd /usr/local/openvpn_as/etc/db
 [ -e notification.db ]&&sqlite3 notification.db .dump>../../notification.db.bak
 cp ../as.conf ../../as.conf.bak
 
-###/tmp/ansible-openvpn/ansible-vault encrypt /usr/local/openvpn_as/*.bak --vault-password-file /opt/backup/vault-password
-
 zip "$DIR/db.zip" /usr/local/openvpn_as/*.bak
 gpg --batch --output $DIR/{{ openvpn_backup_filename }} --passphrase-file $DIR/vault-password --symmetric $DIR/db.zip
-###rm db.zip {{ openvpn_backup_filename }}
 
 aws s3 cp "$DIR/{{ openvpn_backup_filename }}" {{openvpn_backup_s3_path}}/ --region {{ec2_instance.region}}
 

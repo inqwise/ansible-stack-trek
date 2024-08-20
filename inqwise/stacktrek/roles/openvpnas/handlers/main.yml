@@ -1,10 +1,8 @@
 ---
 # handlers file for openvpn_as
+
 - name: update db
-  command: ./confdba --load --file=../etc/config.json
-  args:
-    chdir: /usr/local/openvpn_as/scripts
-  ignore_errors: true
+  ansible.builtin.include_tasks: updatedb.yml
   when: openvpn_service_start_and_enable
 
 - name: restart openvpn_as

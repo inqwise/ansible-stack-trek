@@ -1,6 +1,8 @@
 ---
 # tasks file for openvpn_as
-- include_tasks: amazon.yml
+
+- name: Include task amazon
+  ansible.builtin.include_tasks: amazon.yml
   when: ansible_distribution == "Amazon"
   tags: installation
 
@@ -22,7 +24,7 @@
     dest: /usr/local/openvpn_as/etc/as.conf
     owner: root
     group: root
-    mode: 0644
+    mode: 0600
   notify:
     - restart openvpn_as
   tags: configuration

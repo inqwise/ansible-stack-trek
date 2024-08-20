@@ -1,0 +1,12 @@
+---
+
+- name: Copy updatedb script
+  copy:
+    src: "updatedb.sh"
+    dest: "/tmp/"
+    mode: "0755"
+
+- name: execute updatedb
+  command: /tmp/updatedb.sh
+  args:
+    chdir: /usr/local/openvpn_as/scripts

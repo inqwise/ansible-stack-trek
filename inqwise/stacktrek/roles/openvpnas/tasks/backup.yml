@@ -15,5 +15,5 @@
     day: "*"
     month: "*"
     weekday: "*"
-    job: "/opt/backup/openvpn-backup.sh"
+    job: "/opt/backup/openvpn-backup.sh >> /var/log/openvpn_backup.log 2>&1"
   tags: configuration
