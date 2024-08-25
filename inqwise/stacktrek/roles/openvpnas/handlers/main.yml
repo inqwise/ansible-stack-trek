@@ -8,5 +8,6 @@
 - name: restart openvpn_as
   service:
     name: "{{ openvpn_as_service_name }}"
+    enabled: true
     state: restarted
   when: openvpn_service_start_and_enable

@@ -52,13 +52,12 @@
 - include_tasks: restore.yml
   tags: ['configuration','installation']
 
-- name: Ensure OpenVPN Access Server service is started and enabled on boot
+- name: Ensure OpenVPN Access Server service is disabled on boot in installation mode
   service:
     name: "{{ openvpn_as_service_name }}"
-    enabled: yes
+    enabled: false
     pattern: "{{ openvpn_as_service_name }}"
-    state: started
-  tags: configuration
+  tags: installation
 
 - include_tasks: backup.yml
   tags: ['configuration','installation']
