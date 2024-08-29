@@ -1,0 +1,17 @@
+---
+
+namespace: inqwise
+name: stacktrek
+version: 1.0.0
+readme: README.md
+authors:
+  - Inqwise <inqwise.com>
+  - Alex Misyuk <alex@inqwise.com>
+description: Ansible collection with various applications
+license:
+  - GPL-3.0-or-later
+tags: 
+  - stacktrek
+  - inqwise
+repository: https://github.com/inqwise/stack-trek
+issues: https://github.com/inqwise/stack-trek/issues
