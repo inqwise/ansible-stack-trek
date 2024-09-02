@@ -1,0 +1,44 @@
+---
+
+- name: Install
+  when: kafka_install
+  tags: installation
+  block:
+    - name: Fetch java home
+      ansible.builtin.include_role: 
+        name: inqwise.common.java
+        tasks_from: javahome
+      when: not java_home is defined
+
+    - name: OS tune role
+      ansible.builtin.include_role:
+        name: inqwise.common.os_tune
+        tasks_from: kafka
+      vars:
+        ulimit:
+          user: "{{ kafka_user }}"  
+
+- name: Kafka Task
+  ansible.builtin.import_tasks: kafka.yml
+
+- name: Configure
+  tags: configuratinon
+  when: kafka_configure
+  block:     
+    - name: Zookeeper Task
+      ansible.builtin.include_tasks: zookeeper.yml
+      when: not skip_zookeeper
+
+    - name: Consul template task
+      ansible.builtin.include_tasks: consul-template.yml
+      when: kafka_consult_template_enabled
+
+    - name: Logger Task
+      ansible.builtin.include_tasks: logger.yml
+    
+    - name: Reload daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
+      
+    - name: Scripts Task
+      ansible.builtin.include_tasks: scripts.yml

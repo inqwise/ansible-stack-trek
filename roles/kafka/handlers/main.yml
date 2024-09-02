@@ -1,0 +1,15 @@
+---
+
+- name: restart zookeeper
+  service:
+    name: zookeeper 
+    state: restarted
+    enabled: yes
+  when: kafka_service_start_and_enable
+
+- name: restart kafka
+  service:
+    name: kafka 
+    state: restarted
+    enabled: yes
+  when: kafka_service_start_and_enable

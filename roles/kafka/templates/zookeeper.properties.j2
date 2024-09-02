@@ -1,0 +1,11 @@
+dataDir={{ zookeeper_data_dir }}
+clientPort=2181
+maxClientcnxns=60
+initLimit=10
+syncLimit=5
+tickTime=2000
+{% if cluster_nodes is defined %}
+{% for node in cluster_nodes %}
+server.{{ loop.index }}={{ node }}:2888:3888
+{% endfor %}
+{% endif %}

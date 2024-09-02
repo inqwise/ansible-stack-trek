@@ -1,18 +1,17 @@
 ---
 
 - name: install
+  tags: installation
   block:
     - name: Import MySQL GPG public key
       rpm_key:
         key: "{{mysql_gpg_public_key_url | default(default_mysql_gpg_public_key_url)}}"
         state: present
-      tags: installation
 
     - name: check RPM exist in local cache
       stat:
         path: "{{ disk.mount }}/mysql-yum-repository.rpm"
       register: mysql_repository_install
-      tags: installation
 
     - name: download RPM from http
       get_url:
@@ -21,32 +20,29 @@
         validate_certs: no
         force: no
       when: mysql_repository_install.stat.exists == False and (mysql_yum_repository_url | default(default_mysql_yum_repository_url)).startswith('http')
-      tags: installation
 
     - name: download RPM from s3
       command: "aws s3 cp {{mysql_yum_repository_url | default(default_mysql_yum_repository_url)}} {{ disk.mount }}/mysql-yum-repository.rpm"
       when: mysql_repository_install.stat.exists == False and (mysql_yum_repository_url | default(default_mysql_yum_repository_url)).startswith('s3')
-      tags: installation
 
     - name: install MySQL Repository
       ansible.builtin.package:
         name:
           - '{{ disk.mount }}/mysql-yum-repository.rpm'
         state: present
-      tags: installation
     
     - name: install MySQL community server
       ansible.builtin.package:
         name:
           - 'mysql-community-server'
         state: present
-      tags: installation
 
     - import_role:
         name: os_tune
         tasks_from: mysql
 
 - name: config
+  tags: configuration
   block:
     - include_tasks: secure-installation.yml
  

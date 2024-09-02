@@ -1,0 +1,11 @@
+---
+
+- name: Copy 'log4j.properties' to config
+  ansible.builtin.copy:
+    src: 'log4j.properties'
+    dest: '{{ kafka_config_folder }}/'
+    mode: 0644
+    group: "{{ kafka_group }}"
+    owner: "{{ kafka_user }}"
+    backup: true
+  notify: restart kafka

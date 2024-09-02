@@ -1,0 +1,36 @@
+---
+
+kafka_user: "kafka"
+kafka_group: "kafka"
+kafka_folder: "/data/kafka"
+kafka_home_folder: "{{ kafka_folder }}/home"
+kafka_config_folder: "{{ kafka_home_folder }}/config"
+kafka_server_properties_path: "{{ kafka_config_folder }}/server.properties"
+kafka_data_dir: "{{ kafka_folder }}/data"
+kafka_staging_folder: "/opt"
+kafka_src_file: kafka.tgz
+kafka_scripts_full_path: "{{ kafka_folder }}/scripts"
+skip_zookeeper: true
+#java_usr_folder: /usr/lib/jvm
+#java_latest_folder: /usr/lib/jvm/latest
+#zookeeper_data_dir: /var/zookeeper
+kafka_install: true
+kafka_configure: true
+kafka_url: https://dlcdn.apache.org/kafka/3.8.0/kafka_2.13-3.8.0.tgz
+#zookeeper_connect: ""
+kafka_service_start_and_enable: "{{ 'all' in ansible_run_tags or 'configuration' in ansible_run_tags }}"
+kafka_consult_template_enabled: true
+kafka_consul_template_node_id_key: "config/kafka/node.id"
+kafka_consul_template_zookeeper_connection_key: "config/zookeeper/connection"
+kafka_num_partitions: 50
+kafka_default_replication_factor: 3
+kafka_min_insync_replicas: 2
+kafka_delete_topic_enable: true
+kafka_log_retention_hours: 168
+kafka_log_segment_bytes: 1073741824
+kafka_log_retention_check_interval_ms: 300000
+kafka_auto_create_topics_enable: true
+kafka_consul_template_files_var_name: consul_template_template_files
+kafka_consul_template_templates_var_name: consul_template_templates
+kafka_consul_template_restart_service_handler_name: "restart consul-template"
+kafka_consul_template_user: "consult"

@@ -1,0 +1,37 @@
+---
+
+- name: Ensure user consul template has write access to the config directory
+  ansible.builtin.acl:
+    path: "{{ kafka_config_folder }}"
+    entity: "{{ kafka_consul_template_user }}"
+    etype: user
+    permissions: rwx
+    state: present
+  tags: configuration
+
+- name: Create kafka properties consul-template file
+  ansible.builtin.template:
+    src: server.properties.ctmpl.j2
+    dest: "{{ kafka_config_folder }}/server.properties.ctmpl"
+    mode: 0644
+    group: "{{ kafka_group }}"
+    owner: "{{ kafka_user }}"
+  notify: "{{ kafka_consul_template_restart_service_handler_name }}"
+  tags: configuration
+
+- name: Add server.properties to consul-template
+  ansible.builtin.set_fact:
+    "{{ kafka_consul_template_files_var_name }}": >-
+      {{ (vars[kafka_consul_template_files_var_name] | default([])) + 
+      [kafka_config_folder + '/server.properties.ctmpl'] }}
+    "{{ kafka_consul_template_templates_var_name }}": >-
+      {{ (vars[kafka_consul_template_templates_var_name] | default([])) + 
+      [{
+        'name': 'server.properties.ctmpl',
+        'destination': kafka_config_folder + '/server.properties',
+        'command': 'sudo systemctl restart kafka',
+        'perms': '0664',
+        'backup': true,
+        'wait': { 'min': '2s', 'max': '10s' }
+      }] }}
+  tags: configuration

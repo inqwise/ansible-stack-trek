@@ -1,0 +1,37 @@
+---
+
+- name: Create zookeeper.service
+  ansible.builtin.template:
+    src: zookeeper.service.j2
+    dest: /etc/systemd/system/zookeeper.service
+    mode: 0644
+  notify: restart zookeeper
+  tags: configuration
+
+- name: Ensures {{ zookeeper_data_dir }} dir exists
+  ansible.builtin.file: 
+    path: '{{ zookeeper_data_dir }}'
+    group: "{{ kafka_group }}"
+    owner: "{{ kafka_user }}"
+    state: directory
+  tags: configuration
+
+- name: Replace zookeeper properties file
+  ansible.builtin.template:
+    src: zookeeper.properties.j2
+    dest: '{{ kafka_folder }}/config/zookeeper.properties'
+    mode: 0644
+    group: "{{ kafka_group }}"
+    owner: "{{ kafka_user }}"
+    backup: yes
+  notify: restart zookeeper
+  tags: configuration
+
+- name: Creating a file myid
+  ansible.builtin.copy:
+    dest: '{{ zookeeper_data_dir }}/myid'
+    content: |
+      {{ broker_id }}
+  notify: restart zookeeper
+  when: broker_id is defined
+  tags: configuration

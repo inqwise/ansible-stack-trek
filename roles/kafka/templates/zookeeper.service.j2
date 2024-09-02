@@ -1,0 +1,16 @@
+[Unit]
+Requires=zookeeper.service
+After=zookeeper.service
+
+[Service]
+Type=simple
+User={{ kafka_user }}
+Environment=JAVA_HOME={{ java_home.stdout }}
+Environment="EXTRA_ARGS=-name zookeeper"
+ExecStart=/bin/sh -c '{{ kafka_folder }}/bin/zookeeper-server-start.sh {{ kafka_folder }}/config/zookeeper.properties'
+ExecStop={{ kafka_folder }}/bin/zookeeper-server-stop.sh
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

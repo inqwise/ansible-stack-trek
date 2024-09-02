@@ -1,0 +1,19 @@
+[Unit]
+{% if not skip_zookeeper%}
+Requires=zookeeper.service
+After=zookeeper.service
+{% endif %}
+After=network.target
+
+[Service]
+Type=simple
+User={{ kafka_user }}
+Environment=JAVA_HOME={{ java_home }}
+Environment="EXTRA_ARGS=-name kafkaServer"
+ExecStart=/bin/sh -c '{{ kafka_folder }}/home/bin/kafka-server-start.sh {{ kafka_server_properties_path }} > {{ kafka_folder }}/logs/kafka.log 2>&1'
+ExecStop={{ kafka_folder }}/home/bin/kafka-server-stop.sh
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

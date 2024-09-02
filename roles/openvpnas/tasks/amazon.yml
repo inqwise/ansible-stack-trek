@@ -17,8 +17,8 @@
       get_url:
         dest: "{{ temp_dir.path }}/openvpn-yum-repository.rpm"
         url: "{{ openvpn_yum_repository_url }}"
-        validate_certs: no
-        force: no
+        validate_certs: false
+        force: false
       when: openvpn_repository_install.stat.exists == False and openvpn_yum_repository_url.startswith('http')
 
     - name: download RPM from s3

@@ -1,0 +1,32 @@
+---
+
+- name: Create scripts folder
+  ansible.builtin.file:
+    path: '{{ kafka_scripts_full_path }}'
+    owner: '{{ kafka_user }}' 
+    group: '{{ kafka_group }}'
+    mode: '41774'
+    state: directory
+  register: reg_scripts_path
+
+- name: debug reg_scripts_path
+  ansible.builtin.debug: 
+    var: reg_scripts_path
+    verbosity: 0
+  tags: debug
+
+- name: Copy scripts to {{ reg_scripts_path.path }} folder
+  ansible.builtin.copy:
+    src: scripts/
+    dest: "{{ reg_scripts_path.path }}"
+    owner: '{{ kafka_user }}' 
+    group: '{{ kafka_group }}'
+    mode: '100755'
+
+- name: Recursively change mode of a {{ reg_scripts_path.path }} directory
+  ansible.builtin.file:
+    path: "{{ reg_scripts_path.path }}"
+    state: directory
+    recurse: yes
+    mode: '100755'
+    

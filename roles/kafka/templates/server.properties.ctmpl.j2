@@ -1,0 +1,19 @@
+
+node.id={{ "{{" }} keyOrDefault "{{ kafka_consul_template_node_id_key }}" "1" {{ "}}" }}
+listeners=PLAINTEXT://0.0.0.0:9092
+controller.quorum.voters={{ "{{" }} range service "kafka-controller" {{ "}}" }}{{ "{{" }} .Node.Address {{ "}}" }}:9093,{{ "{{" }} end {{ "}}" }}
+process.roles=broker,controller
+{% if not skip_zookeeper %}
+zookeeper.connect={{ "{{" }} key "{{ kafka_consult_template_zookeeper_connection_key }}" {{ "}}" }}
+{% endif %}
+
+advertised.listeners=PLAINTEXT://{{ kafka_advertised_listener | default(ansible_fqdn) }}:9092
+log.dirs={{ kafka_data_dir }}
+num.partitions= {{ kafka_num_partitions }}
+default.replication.factor={{ kafka_default_replication_factor }}
+min.insync.replicas={{ kafka_min_insync_replicas }}
+delete.topic.enable={{ kafka_delete_topic_enable }}
+log.retention.hours={{ kafka_log_retention_hours }}
+log.segment.bytes={{ kafka_log_segment_bytes }}
+log.retention.check.interval.ms={{ kafka_log_retention_check_interval_ms }}
+auto.create.topics.enable={{ kafka_auto_create_topics_enable }}
