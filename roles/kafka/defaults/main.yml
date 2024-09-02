@@ -34,3 +34,8 @@ kafka_consul_template_files_var_name: consul_template_template_files
 kafka_consul_template_templates_var_name: consul_template_templates
 kafka_consul_template_restart_service_handler_name: "restart consul-template"
 kafka_consul_template_user: "consult"
+kafka_node_id: 1
+kafka_controller_quorum_voters: "{{ kafka_node_id }}@{{ ansible_default_ipv4.address }}:9093"
+kafka_cluster_uuid: "_4sk-IQDQz6hdwHHzEh5ZA"
+
+

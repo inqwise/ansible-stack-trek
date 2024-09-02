@@ -1,0 +1,19 @@
+---
+
+- name: Check if meta.properties file exists
+  stat:
+    path: "{{ kafka_data_dir }}/meta.properties"
+  register: meta_properties_check
+  tags: configuration
+
+- name: Initialize Kafka cluster
+  command: >
+    {{ kafka_home_folder }}/bin/kafka-storage.sh format
+    -t {{ kafka_cluster_uuid }}
+    -c {{ kafka_home_folder }}/config/server.properties
+  args:
+    chdir: "{{ kafka_home_folder }}"
+  become_user: "{{ kafka_user }}"
+  notify: restart kafka
+  when: meta_properties_check.stat.exists == False
+  tags: configuration
