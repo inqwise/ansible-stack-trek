@@ -21,6 +21,9 @@
 - name: Kafka Task
   ansible.builtin.import_tasks: kafka.yml
 
+- name: Kraft cluster Task
+  ansible.builtin.import_tasks: kraft-cluster.yml
+
 - name: Configure
   tags: configuratinon
   when: kafka_configure
