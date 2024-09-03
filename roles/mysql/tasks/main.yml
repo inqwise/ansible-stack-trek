@@ -38,7 +38,7 @@
         state: present
 
     - import_role:
-        name: os_tune
+        name: inqwise.common.os_tune
         tasks_from: mysql
 
 - name: config
@@ -48,4 +48,3 @@
  
     - include_tasks: scripts.yml
       when: tmp_root_password.stdout != "" and false
-  
