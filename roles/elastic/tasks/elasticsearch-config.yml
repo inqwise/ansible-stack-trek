@@ -1,0 +1,88 @@
+---
+# Configure Elasticsearch Node
+- name: Create the Elasticsearch data directories.
+  ansible.builtin.file:
+    path: "{{ es_data_dir }}"
+    owner: "{{ es_user }}"
+    group: "{{ es_group }}"
+    state: directory
+    mode: '42750'
+
+- name: Create the Elasticsearch log directories.
+  ansible.builtin.file:
+    path: "{{ es_log_dir }}"
+    owner: "{{ es_user }}"
+    group: "{{ es_group }}"
+    state: directory
+    mode: '42750'
+
+- name: Create the Elasticsearch system override directories.
+  ansible.builtin.file:
+    path: "/etc/systemd/system/elasticsearch.service.d/"
+    owner: root
+    group: root
+    state: directory
+    mode: '40755'     
+
+#Copy the config template
+- name: Copy Configuration File
+  ansible.builtin.template:
+    src: elasticsearch.yml.j2
+    dest: "/etc/elasticsearch/elasticsearch.yml"
+    owner: root
+    group: "{{ es_group }}"
+    mode: 100660
+    force: yes
+  register: system_change
+  notify: restart elasticsearch
+
+#Copy the default file
+- name: Copy Default File
+  ansible.builtin.template:
+    src: elasticsearch.j2
+    dest: /etc/sysconfig/elasticsearch
+    owner: root
+    group: "{{ es_group }}"
+    mode: "660"
+    force: yes
+  notify: restart elasticsearch
+
+  #copy elastic system overide file
+- name: Copy override.conf
+  ansible.builtin.copy:
+    src: systemd/elasticsearch_override.conf
+    dest: /etc/systemd/system/elasticsearch.service.d/override.conf
+    owner: root
+    group: root
+    mode: '40755'
+
+#Copy the systemd specific file if systemd is installed
+- when: use_system_d and m_lock_enabled
+  become: true
+  block:
+    - name: Make sure destination dir exists
+      file:
+        path: "{{ sysd_config_file | dirname }}"
+        state: directory
+        mode: "755"
+
+    - name: Copy specific ElasticSearch Systemd config file
+      ini_file:
+        path: "{{ sysd_config_file }}"
+        section: Service
+        option: LimitMEMLOCK
+        value: infinity
+        mode: "644"
+      notify:
+       - reload systemd configuration
+       - restart elasticsearch
+
+- name: Copy jvm.options File
+  ansible.builtin.template:
+    src: jvm.options.j2
+    dest: "/etc/elasticsearch/jvm.options.d/jvm.options"
+    owner: root
+    group: "{{ es_group }}"
+    mode: "660"
+    force: yes
+  notify: restart elasticsearch

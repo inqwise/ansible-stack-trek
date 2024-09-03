@@ -1,0 +1,52 @@
+---
+- debug: var=es_discovery.ec2.es_cluster
+- debug: var=environment_name
+- debug: var=discord_message_owner_name
+
+- name: Install
+  block:
+
+    - name: Add Elasticsearch gpg key
+      rpm_key:
+        key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        state: present
+
+    - name: Copy elasticsearch.repo file with owner and permission, using symbolic representation
+      ansible.builtin.copy:
+        src: elasticsearch.repo
+        dest: /etc/yum.repos.d/elasticsearch.repo
+        owner: root
+        group: root
+        mode: u=rw,g=r,o=r
+
+    - name: install elastic and common software requirements
+      ansible.builtin.package:
+        name:
+          - 'htop'
+          - 'net-tools'
+          - elasticsearch
+        state: present
+
+    - import_tasks: aws-plugins.yml
+      when: es_discovery['ec2'] is defined
+
+    - import_role:
+        name: inqwise.common.os_tune
+        tasks_from: elastic
+
+  when: elastic_install|default(True)
+
+- name: Configure
+  block:
+
+    - name: check-set-parameters
+      include_tasks: elasticsearch-parameters.yml
+      tags:
+          - always   
+
+    - name: include elasticsearch-config.yml
+      include_tasks: elasticsearch-config.yml
+      tags:
+        - config
+
+  when: elastic_configure|default(True)

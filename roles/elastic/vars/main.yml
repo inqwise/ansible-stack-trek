@@ -1,0 +1,3 @@
+---
+sysd_config_file: "/etc/systemd/system/elasticsearch.service.d/override.conf"
+es_home: "/usr/share/elasticsearch"

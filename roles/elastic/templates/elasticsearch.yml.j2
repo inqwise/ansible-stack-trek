@@ -1,0 +1,58 @@
+cluster.name: {{ es_config['cluster_name'] | default(default_ec2_cluster_name) }}
+node.name: {{ es_config['node_name'] | default(ansible_hostname) }}
+node.master: {{ es_config['node_master'] | default('true') }}
+node.data: {{ es_config['node_data'] | default('true') }}
+node.ingest: false
+search.remote.connect: false
+path.data: {{ es_data_dir }}
+path.logs: {{ es_log_dir }}
+bootstrap.memory_lock: {{ es_config['bootstrap_memory_lock'] | default('true') }}
+network.host: {{ es_config['network_host'] | default(default_es_config['network_host']) }}
+{% if es_network is defined  %}
+network.publish_host: {{ es_network['publish_bind_host'] | default(default_es_network['publish_bind_host']) }}
+network.bind_host: {{ es_network['publish_bind_host'] | default(default_es_network['publish_bind_host']) }}
+{% endif %}
+#
+# EC2
+{% if es_discovery is defined and es_discovery['ec2'] is defined and es_discovery['ec2']|length  %}
+discovery.seed_providers: ec2
+{% if es_discovery.ec2['group'] is defined %}
+discovery.ec2.groups: ['{{es_discovery.ec2['group']}}']
+{% else %}
+discovery.ec2.any_group: true
+{% endif %}
+logger.org.elasticsearch.discovery.ec2: "TRACE"
+discovery.ec2.host_type: {{ es_discovery.ec2['host_type'] | default(default_es_discovery['host_type']) }}
+cloud.node.auto_attributes: {{ es_discovery.ec2['auto_attributes'] | default(default_es_discovery.ec2['auto_attributes']) }}
+cluster.routing.allocation.awareness.attributes: {{ es_discovery.ec2['awareness.attributes'] | default(default_es_discovery.ec2['awareness.attributes']) }}
+discovery.ec2.tag.es_cluster: {{ es_discovery.ec2['es_cluster'] | default(default_es_discovery.ec2['es_cluster']) }}
+{% if es_discovery.ec2['initial_master_nodes'] is defined and es_discovery.ec2['initial_master_nodes'] | length > 0 %}
+cluster.initial_master_nodes: {{ es_discovery.ec2['initial_master_nodes'] }}
+{% endif %}
+{% if es_discovery.ec2['seed_hosts'] is defined and es_discovery.ec2['seed_hosts'] | length %}
+discovery.seed_hosts: {{ es_discovery.ec2['seed_hosts'] | default(default_es_discovery.ec2['seed_hosts']) | to_json}}
+{% endif %}
+{% endif %}
+#
+# ZEN
+{% if es_discovery is defined and es_discovery['zen'] is defined and es_discovery['zen']|length  %}
+cluster.initial_master_nodes: {{ es_discovery.zen['initial_master_nodes'] | default(default_es_discovery.zen['initial_master_nodes']) }}
+{% endif %}
+# ---------------------------------- Various -----------------------------------
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+http.cors.allow-methods: OPTIONS,HEAD,GET,POST,PUT,DELETE
+http.cors.allow-headers: X-Requested-With,X-Auth-Token,Content-Type,Content-Length
+http.max_content_length: 256mb
+
+xpack.security.enabled: false
+xpack.ml.enabled: false
+xpack.graph.enabled: false
+xpack.watcher.enabled: false
+action.auto_create_index: false
+
+logger.level.org.elasticsearch.client.RestClient: ERROR
+
+xpack.ilm.enabled: false
+ingest.geoip.downloader.enabled: false
+cluster.deprecation_indexing.enabled: false

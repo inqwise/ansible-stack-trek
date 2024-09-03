@@ -1,0 +1,52 @@
+---
+es_config: {}
+es_max_open_files: 65536
+es_max_map_count: 262144
+es_data_dir: "{{ disk.mount }}/{{ disk.data_folder }}/data"
+es_log_dir: "{{ disk.mount }}/{{ disk.data_folder }}/log"
+default_memory_size: 1g
+default_es_cluster_name: "custom-cluster"
+default_es_config:
+  network_host: 0.0.0.0
+default_es_network:
+  publish_bind_host: "_eth1_"
+default_es_discovery:
+  ec2:
+    any_group: true
+    host_type: "private_ip"
+    auto_attributes: true
+    awareness.attributes: "aws_availability_zone"
+    es_cluster: "custom-cluster-elastic01"
+    minimum_master_nodes: 2
+    seed_hosts: []
+  zen:
+    seed_hosts: []
+
+
+
+
+#     elastic_install: "{{ is_full_process or is_golden_image_process }}"
+#     elastic_configure: "{{ is_full_process or not is_golden_image_process }}"
+#     es_user: "{{ elastic_user }}"
+#     es_group: "{{ elastic_group }}"
+#     es_data_dir: "{{ disk.mount }}/{{ disk.data_folder }}/data"
+#     es_log_dir: "{{ disk.mount }}/{{ disk.data_folder }}/log"
+#     es_config:
+#       network_host: "0.0.0.0"
+#       node_name: "{{ private_dns | default(ansible_hostname) }}"
+#       cluster_name: "{{ es_cluster_name }}"
+#       node_data: "{{ node_data }}"
+#       node_master: "{{ node_master }}"
+#     es_discovery:
+#       ec2:
+#         group: "elastic"
+#         host_type: "private_ip"
+#         auto_attributes: true
+#         awareness.attributes: "aws_availability_zone"
+#         es_cluster: "{{ es_discovery_cluster|default('') }}"
+#         initial_master_nodes: "{{ (initial_master_nodes|default('')).split(',')|select() }}"
+#         seed_hosts: "{{ (seed_hosts|default('')).split(',')|select() }}"
+#         minimum_master_nodes: "{{ minimum_master_nodes|default('') }}"
+#     memory_size: "{{ es_memory_size|default('') }}"
+#     ulimit:
+#       user: "{{ elastic_user }}"

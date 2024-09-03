@@ -1,0 +1,20 @@
+---
+- name: Check if discovery-ec2 exist
+  stat: path="/usr/share/elasticsearch/plugins/discovery-ec2"
+  register: discovery_ec2_plugin 
+
+- name: Install discovery-ec2 plugin discovery.
+  command: /usr/share/elasticsearch/bin/elasticsearch-plugin install -b discovery-ec2
+  when: discovery_ec2_plugin.stat.isdir is not defined
+  register: system_change
+  notify: restart elasticsearch
+
+- name: Check if repository-s3 exist
+  stat: path="/usr/share/elasticsearch/plugins/repository-s3"
+  register: repository_s3_plugin 
+
+- name: Install repository-s3 plugin repository.
+  command: /usr/share/elasticsearch/bin/elasticsearch-plugin install -b repository-s3
+  when: repository_s3_plugin.stat.isdir is not defined
+  register: system_change
+  notify: restart elasticsearch
