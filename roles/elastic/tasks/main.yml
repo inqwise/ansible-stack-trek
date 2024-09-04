@@ -33,9 +33,6 @@
     - name: include aws-plugins
       ansible.builtin.include_tasks:
         name: aws-plugins.yml
-        apply:
-          tags: installation
-      tags: installation
       when: es_discovery['ec2'] is defined
 
     - import_role:
@@ -45,6 +42,7 @@
   when: elastic_install|default(True)
 
 - name: Configure
+  tags: configuration
   block:
     - name: check-set-parameters
       ansible.builtin.include_tasks:
