@@ -1,5 +1,4 @@
 ---
-
 - name: "Debug '{{ mysql_script }}' script command"
   debug:
     msg: "mysql -u root -p### < '{{ mysql_script }}'"
@@ -8,5 +7,3 @@
 - name: "Execute '{{ mysql_script }}' script"
   shell: "mysql -u root --password=\"{{ mysql.root_password }}\" < '{{ mysql_script }}'"
   tags: configuration
-
-

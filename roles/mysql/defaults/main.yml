@@ -1,4 +1,4 @@
-mysql_gpg_public_key_url: https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
+mysql_gpg_public_key_url: https://repo.mysql.com/RPM-GPG-KEY-mysql-2023
 mysql_yum_repository_url: https://repo.mysql.com/mysql84-community-release-el9-1.noarch.rpm
 mysql_process_init_scripts: false
 mysql_datadir: /data/lib
