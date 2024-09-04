@@ -1,11 +1,14 @@
 ---
 - debug: var=es_discovery.ec2.es_cluster
+  tags: debug
 - debug: var=environment_name
+  tags: debug
 - debug: var=discord_message_owner_name
+  tags: debug
 
 - name: Install
+  tags: installation
   block:
-
     - name: Add Elasticsearch gpg key
       rpm_key:
         key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
@@ -27,7 +30,12 @@
           - elasticsearch
         state: present
 
-    - import_tasks: aws-plugins.yml
+    - name: include aws-plugins
+      ansible.builtin.include_tasks:
+        name: aws-plugins.yml
+        apply:
+          tags: installation
+      tags: installation
       when: es_discovery['ec2'] is defined
 
     - import_role:
@@ -38,15 +46,18 @@
 
 - name: Configure
   block:
-
     - name: check-set-parameters
-      include_tasks: elasticsearch-parameters.yml
-      tags:
-          - always   
+      ansible.builtin.include_tasks:
+        name: elasticsearch-parameters.yml
+        apply:
+          tags: configuration
+      tags: configuration
 
     - name: include elasticsearch-config.yml
-      include_tasks: elasticsearch-config.yml
-      tags:
-        - config
+      ansible.builtin.include_tasks:
+        name: elasticsearch-config.yml
+        apply:
+          tags: configuration
+      tags: configuration            
 
   when: elastic_configure|default(True)

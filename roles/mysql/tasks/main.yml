@@ -4,47 +4,53 @@
   tags: installation
   block:
     - name: Import MySQL GPG public key
-      rpm_key:
-        key: "{{mysql_gpg_public_key_url | default(default_mysql_gpg_public_key_url)}}"
+      ansible.builtin.rpm_key:
+        key: " {{ mysql_gpg_public_key_url }} "
         state: present
 
-    - name: check RPM exist in local cache
-      stat:
-        path: "{{ disk.mount }}/mysql-yum-repository.rpm"
+    - name: Check RPM exist in local cache
+      ansible.builtin.stat:
+        path: "{{ mysql.stage_folder }}/mysql-yum-repository.rpm"
       register: mysql_repository_install
 
-    - name: download RPM from http
-      get_url:
-        dest: "{{ disk.mount }}/mysql-yum-repository.rpm"
-        url: "{{mysql_yum_repository_url | default(default_mysql_yum_repository_url)}}"
-        validate_certs: no
-        force: no
-      when: mysql_repository_install.stat.exists == False and (mysql_yum_repository_url | default(default_mysql_yum_repository_url)).startswith('http')
+    - name: Download RPM from http
+      ansible.builtin.get_url:
+        dest: "{{ mysql.stage_folder }}/mysql-yum-repository.rpm"
+        url: "{{ mysql_yum_repository_url }}"
+        validate_certs: false
+        force: false
+      when: mysql_repository_install.stat.exists == False and mysql_yum_repository_url.startswith('http')
 
-    - name: download RPM from s3
-      command: "aws s3 cp {{mysql_yum_repository_url | default(default_mysql_yum_repository_url)}} {{ disk.mount }}/mysql-yum-repository.rpm"
-      when: mysql_repository_install.stat.exists == False and (mysql_yum_repository_url | default(default_mysql_yum_repository_url)).startswith('s3')
+    - name: Download RPM from s3
+      ansible.builtin.command: "aws s3 cp {{ mysql_yum_repository_url }} {{ mysql.stage_folder }}/mysql-yum-repository.rpm"
+      when: mysql_repository_install.stat.exists == False and mysql_yum_repository_url.startswith('s3')
 
-    - name: install MySQL Repository
+    - name: Install MySQL Repository
       ansible.builtin.package:
         name:
-          - '{{ disk.mount }}/mysql-yum-repository.rpm'
+          - '{{ mysql.stage_folder }}/mysql-yum-repository.rpm'
         state: present
     
-    - name: install MySQL community server
+    - name: Install MySQL community server
       ansible.builtin.package:
         name:
           - 'mysql-community-server'
         state: present
 
-    - import_role:
+    - name: OS tune role
+      ansible.builtin.include_role:
         name: inqwise.common.os_tune
         tasks_from: mysql
+      vars:
+        ulimit:
+          user: "{{ mysql.user }}"
 
 - name: config
   tags: configuration
   block:
-    - include_tasks: secure-installation.yml
- 
-    - include_tasks: scripts.yml
-      when: tmp_root_password.stdout != "" and false
+    - name: Secure
+      ansible.builtin.include_tasks: secure.yml
+      
+    - name: Init Scripts
+      ansible.builtin.include_tasks: scripts.yml
+      when: mysql_process_init_scripts && tmp_root_password.stdout != ""

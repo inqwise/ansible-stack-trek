@@ -1,6 +1,6 @@
 ---
 
-- name: process scripts
+- name: Process scripts
   ansible.builtin.include_tasks: script.yml
   loop: "{{ lookup('fileglob', 'files/scripts/*', wantlist=True) | sort }}"
   loop_control:

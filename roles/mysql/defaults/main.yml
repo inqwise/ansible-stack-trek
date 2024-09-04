@@ -1,2 +1,13 @@
-default_mysql_gpg_public_key_url: https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
-default_mysql_yum_repository_url: https://repo.mysql.com/mysql80-community-release-el9-5.noarch.rpm
+mysql_gpg_public_key_url: https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
+mysql_yum_repository_url: https://repo.mysql.com/mysql84-community-release-el9-1.noarch.rpm
+mysql_process_init_scripts: false
+mysql_datadir: /data/lib
+mysql_user: mysql
+mysql_root_password: "[no4_strong_Passw0rd]"
+mysql_stage_folder: /opt
+
+mysql:
+  user: "{{ mysql_user }}"
+  root_password: "{{ mysql_root_password }}"
+  datadir: "{{ mysql_datadir }}"
+  stage_folder: "{{ mysql_stage_folder }}"
