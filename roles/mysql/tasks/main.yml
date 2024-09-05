@@ -53,4 +53,4 @@
       
     - name: Init Scripts
       ansible.builtin.include_tasks: scripts.yml
-      when: mysql_process_init_scripts && tmp_root_password.stdout != ""
+      when: mysql_process_init_scripts and tmp_root_password.stdout != ""

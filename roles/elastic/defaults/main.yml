@@ -22,6 +22,8 @@ default_es_discovery:
   zen:
     seed_hosts: []
 
+elastic_install: true
+elastic_configure: true
 
 
 
