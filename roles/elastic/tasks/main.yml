@@ -7,8 +7,9 @@
   tags: debug
 
 - name: Install
+  tags: installation
   block:
-    - name: Add Elasticsearch gpg key
+    - name: Add Elasticsearch GPG key
       rpm_key:
         key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
         state: present
@@ -21,7 +22,7 @@
         group: root
         mode: u=rw,g=r,o=r
 
-    - name: install elastic and common software requirements
+    - name: Install elastic and common software requirements
       ansible.builtin.package:
         name:
           - 'htop'
@@ -29,34 +30,26 @@
           - elasticsearch
         state: present
 
-    - name: include aws-plugins
-      ansible.builtin.include_tasks:
-        name: aws-plugins.yml
-        apply:
-          tags: installation
+    - name: Include aws-plugins
+      ansible.builtin.include_tasks: aws-plugins.yml
       tags: installation
       when: es_discovery['ec2'] is defined
 
-    - import_role:
+    - ansible.builtin.import_role:
         name: inqwise.common.os_tune
         tasks_from: elastic
 
-  when: elastic_install|default(True)
+  when: elastic_install
 
 - name: Configure
+  tags: configuration
   block:
-    - name: check-set-parameters
-      ansible.builtin.include_tasks:
-        name: elasticsearch-parameters.yml
-        apply:
-          tags: configuration
+    - name: Check and set parameters
+      ansible.builtin.include_tasks: elasticsearch-parameters.yml
       tags: configuration
 
-    - name: include elasticsearch-config.yml
-      ansible.builtin.include_tasks:
-        name: elasticsearch-config.yml
-        apply:
-          tags: configuration
-      tags: configuration            
+    - name: Include Elasticsearch config
+      ansible.builtin.include_tasks: elasticsearch-config.yml
+      tags: configuration
 
-  when: elastic_configure|default(True)
+  when: elastic_configure
