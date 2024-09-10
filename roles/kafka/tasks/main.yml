@@ -1,15 +1,18 @@
 ---
 
+- name: Fetch java home
+  ansible.builtin.include_role: 
+    name: inqwise.common.java
+    tasks_from: javahome
+    apply:
+      tags: always
+  when: not java_home is defined
+  tags: always
+
 - name: Install
   when: kafka_install
   tags: installation
   block:
-    - name: Fetch java home
-      ansible.builtin.include_role: 
-        name: inqwise.common.java
-        tasks_from: javahome
-      when: not java_home is defined
-
     - name: OS tune role
       ansible.builtin.include_role:
         name: inqwise.common.os_tune
