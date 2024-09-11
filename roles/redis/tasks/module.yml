@@ -1,0 +1,13 @@
+---
+- name: "copy '{{ redis_module }}' module"
+  copy:
+    src: 'modules/{{ cpu_arch }}/{{ redis_module }}'
+    dest: '{{ redis_modules_dir }}'
+    owner: '{{ redis_user }}' 
+    group: '{{ redis_group }}'
+    mode: '100744'
+  when: redis_install|default(True)
+
+- set_fact: 
+    redis_modules: '{{ redis_modules + [ redis_modules_dir + "/" + redis_module ] }}'
+  when: redis_configure|default(True)

@@ -1,0 +1,7 @@
+---
+redis_modules_dir: /opt/redis-modules
+redis_config_path: /etc/redis/redis.conf
+redis_modules: []
+redis_data_dir: /var/lib/redis/
+cpu_arch: aarch64
+redis_service_start_and_enable: "{{ 'all' in ansible_run_tags or 'configuration' in ansible_run_tags }}"
