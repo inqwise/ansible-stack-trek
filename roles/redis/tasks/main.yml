@@ -2,80 +2,57 @@
 
 - name: Install
   tags: installation
+  when: redis_install
   block:
-    - name: install redis 6
-      command: amazon-linux-extras install redis6 -y
-      args:
-        creates: /usr/bin/redis-service
-
-    - name: install packages
+    - name: Install packages
       ansible.builtin.package: 
         name: 
+          - redis6
           - sysfsutils
         state: present
         enablerepo: epel
     
-    - name: disable transparent huge pages for redis performance - persistent change
-      ansible.builtin.lineinfile:
-        path: /etc/sysfs.conf
-        create: true
-        regexp: "^kernel\/mm\/transparent_hugepage\/enabled"
-        line: "kernel/mm/transparent_hugepage/enabled = never"
-        
-    - name: disable transparent huge pages for redis performance - live change
-      ansible.builtin.shell: echo never {{ ">" }} /sys/kernel/mm/transparent_hugepage/enabled
+    - name: OS tune role
+      ansible.builtin.include_role:
+        name: inqwise.common.os_tune
+        tasks_from: redis
 
-    - name: add a vm.overcommit_memory setting at the end of the sysctl.conf
-      ansible.builtin.sysctl: 
-          name: vm.overcommit_memory 
-          value: 1 
-          state: present 
-          reload: yes
-    
-    - name: add a net.core.somaxconn setting at the end of the sysctl.conf
-      ansible.builtin.sysctl: 
-          name: net.core.somaxconn 
-          value: 1024 
-          state: present 
-          reload: yes
-    
-    - name: create redis modules folder
-      file:
-        path: '{{ redis_modules_dir }}'
-        owner: '{{ redis_user }}' 
-        group: '{{ redis_group }}'
-        mode: '40755'
+    - name: Create redis modules folder
+      ansible.builtin.file:
+        path: "{{ redis_modules_dir }}"
+        owner: "{{ redis_user }}" 
+        group: "{{ redis_group }}"
+        mode: "40755"
         state: directory
-
-  when: redis_install|default(True)
-
-- name: process modules
-  ansible.builtin.include_tasks: module.yml
-  loop: "{{ lookup('fileglob', 'files/modules/'+ cpu_arch +'/*', wantlist=True) }}"
-  loop_control:
-    label: "process {{ redis_module }} module"
-  vars:
-    redis_module: "{{ item | basename }}"
-
-- name: debug redis modules
-  ansible.builtin.debug:
-    var: redis_modules
-  run_once: true
-  notify: restart redis
-  when: redis_configure|default(True)
 
 - name: Config
   tags: configuration
+  when: redis_configure
   block:
-    - name: create redis data folder
+    - name: Process modules
+      ansible.builtin.include_tasks: module.yml
+      loop: "{{ query('fileglob', 'files/modules/' + ansible_architecture + '/*') }}"
+      loop_control:
+        label: "{{ redis_module }} module" 
+      vars:
+        redis_module: "{{ item | basename }}"
+        src: "modules/{{ ansible_architecture }}"
+      
+    - name: Debug redis modules
+      ansible.builtin.debug:
+        var: redis_modules
+      run_once: true
+      tags: debug
+
+    - name: Create redis data folder
       ansible.builtin.file:
-        path: '{{ redis_data_dir }}'
-        owner: '{{ redis_user }}' 
-        group: '{{ redis_group }}'
-        mode: '40755'
+        path: "{{ redis_data_dir }}"
+        owner: "{{ redis_user }}" 
+        group: "{{ redis_group }}"
+        mode: "0755"
         state: directory
 
-    - name: apply configuration
+    - name: Apply configuration
       ansible.builtin.template:
         src: redis.conf.v6.j2
         dest: "{{ redis_config_path }}"
@@ -85,5 +62,3 @@
         backup: true
       register: redisconf
       notify: restart redis
-
-  when: redis_configure|default(True)

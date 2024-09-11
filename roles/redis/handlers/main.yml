@@ -3,5 +3,5 @@
   ansible.builtin.service:
     name: "{{ redis_service_name }}"
     state: restarted
-    enabled: yes
+    enabled: true
   when: redis_service_start_and_enable

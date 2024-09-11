@@ -46,10 +46,12 @@
   block:
     - name: Check and set parameters
       ansible.builtin.include_tasks: elasticsearch-parameters.yml
-      tags: configuration
+
+    - name: Consul template task
+      ansible.builtin.include_tasks: consul-template.yml
+      when: elastic_consult_template_enabled
 
     - name: Include Elasticsearch config
       ansible.builtin.include_tasks: elasticsearch-config.yml
-      tags: configuration
 
   when: elastic_configure

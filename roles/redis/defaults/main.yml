@@ -1,7 +1,12 @@
 ---
 redis_modules_dir: /opt/redis-modules
-redis_config_path: /etc/redis/redis.conf
+redis_config_path: /etc/redis6/redis6.conf
 redis_modules: []
-redis_data_dir: /var/lib/redis/
-cpu_arch: aarch64
+redis_data_dir: /var/lib/redis6
+redis_log_dir: /var/log/redis6
+redis_configure: true
+redis_install: true
+redis_user: redis6
+redis_service_name: redis6
+redis_group: "{{ redis_user }}"
 redis_service_start_and_enable: "{{ 'all' in ansible_run_tags or 'configuration' in ansible_run_tags }}"

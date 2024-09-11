@@ -4,6 +4,7 @@ es_max_open_files: 65536
 es_max_map_count: 262144
 es_data_dir: "{{ disk.mount }}/{{ disk.data_folder }}/data"
 es_log_dir: "{{ disk.mount }}/{{ disk.data_folder }}/log"
+es_config_dir: "/etc/elasticsearch"
 default_memory_size: 1g
 default_es_cluster_name: "custom-cluster"
 default_es_config:
@@ -24,3 +25,8 @@ default_es_discovery:
 
 elastic_install: true
 elastic_configure: true
+elastic_consult_template_enabled: false
+elastic_consul_template_files_var_name: consul_template_template_files
+elastic_consul_template_templates_var_name: consul_template_templates
+elastic_consul_template_restart_service_handler_name: "restart consul-template"
+elastic_consul_template_user: "consult"

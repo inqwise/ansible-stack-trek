@@ -28,11 +28,11 @@
 - name: Copy Configuration File
   ansible.builtin.template:
     src: elasticsearch.yml.j2
-    dest: "/etc/elasticsearch/elasticsearch.yml"
+    dest: "{{ es_config_dir }}/elasticsearch.yml"
     owner: root
     group: "{{ es_group }}"
-    mode: 100660
-    force: yes
+    mode: "660"
+    force: true
   register: system_change
   notify: restart elasticsearch
 
@@ -44,7 +44,7 @@
     owner: root
     group: "{{ es_group }}"
     mode: "660"
-    force: yes
+    force: true
   notify: restart elasticsearch
 
   #copy elastic system overide file

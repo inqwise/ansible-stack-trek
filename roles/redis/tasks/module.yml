@@ -1,13 +1,12 @@
 ---
-- name: "copy '{{ redis_module }}' module"
-  copy:
-    src: 'modules/{{ cpu_arch }}/{{ redis_module }}'
-    dest: '{{ redis_modules_dir }}'
-    owner: '{{ redis_user }}' 
-    group: '{{ redis_group }}'
-    mode: '100744'
-  when: redis_install|default(True)
+- name: "Copy '{{ redis_module }}' module"
+  ansible.builtin.copy:
+    src: "{{ src }}/{{ redis_module }}"
+    dest: "{{ redis_modules_dir }}"
+    owner: "{{ redis_user }}" 
+    group: "{{ redis_group }}"
+    mode: "744"
+  notify: restart redis
 
 - set_fact: 
-    redis_modules: '{{ redis_modules + [ redis_modules_dir + "/" + redis_module ] }}'
-  when: redis_configure|default(True)
+    redis_modules: "{{ redis_modules + [ redis_modules_dir + '/' + redis_module ] }}"
