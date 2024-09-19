@@ -84,5 +84,5 @@
     owner: root
     group: "{{ es_group }}"
     mode: "660"
-    force: yes
+    backup: true
   notify: restart elasticsearch

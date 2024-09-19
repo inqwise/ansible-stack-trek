@@ -38,12 +38,9 @@
 
 # Xms represents the initial size of total heap space
 # Xmx represents the maximum size of total heap space
-{% if memory_size is defined %}
--Xms{{ memory_size }}
--Xmx{{ memory_size }}
-{% else %}
--Xms{{ default_memory_size }}
--Xmx{{ default_memory_size }}
+{% if es_memory_size is defined %}
+-Xms{{ es_memory_size }}
+-Xmx{{ es_memory_size }}
 {% endif %}
 
 ################################################################

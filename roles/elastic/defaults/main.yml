@@ -5,7 +5,8 @@ es_max_map_count: 262144
 es_data_dir: "{{ disk.mount }}/{{ disk.data_folder }}/data"
 es_log_dir: "{{ disk.mount }}/{{ disk.data_folder }}/log"
 es_config_dir: "/etc/elasticsearch"
-default_memory_size: 1g
+es_user: elasticsearch
+es_group: "{{ es_user }}"
 default_es_cluster_name: "custom-cluster"
 default_es_config:
   network_host: 0.0.0.0

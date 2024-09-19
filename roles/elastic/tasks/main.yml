@@ -8,42 +8,53 @@
 
 - name: Install
   tags: installation
+  when: elastic_install
   block:
     - name: Add Elasticsearch GPG key
       rpm_key:
         key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
         state: present
 
-    - name: Copy elasticsearch.repo file with owner and permission, using symbolic representation
+    - name: Copy elasticsearch.repo
       ansible.builtin.copy:
         src: elasticsearch.repo
         dest: /etc/yum.repos.d/elasticsearch.repo
         owner: root
         group: root
-        mode: u=rw,g=r,o=r
+        mode: '0644'
 
-    - name: Install elastic and common software requirements
+    - name: Install elastic
       ansible.builtin.package:
         name:
-          - 'htop'
-          - 'net-tools'
           - elasticsearch
         state: present
 
     - name: Include aws-plugins
       ansible.builtin.include_tasks: aws-plugins.yml
-      tags: installation
       when: es_discovery['ec2'] is defined
 
-    - ansible.builtin.import_role:
+    - ansible.builtin.include_role:
         name: inqwise.common.os_tune
         tasks_from: elastic
-
-  when: elastic_install
+      vars:
+        ulimit:
+          user: "{{ es_user }}"
 
 - name: Configure
   tags: configuration
+  when: elastic_configure
   block:
+    - name: Calculate Memory
+      ansible.builtin.include_role:
+        name: inqwise.common.java
+        tasks_from: javamemory
+      when: es_memory_size is not defined
+
+    - name: Define es_memory_size
+      ansible.builtin.set_fact:
+        es_memory_size: "{{ java_xms }}"
+      when: es_memory_size is not defined
+
     - name: Check and set parameters
       ansible.builtin.include_tasks: elasticsearch-parameters.yml
 
@@ -53,5 +64,3 @@
 
     - name: Include Elasticsearch config
       ansible.builtin.include_tasks: elasticsearch-config.yml
-
-  when: elastic_configure

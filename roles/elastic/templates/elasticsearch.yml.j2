@@ -17,7 +17,7 @@ network.bind_host: {{ es_network['publish_bind_host'] | default(default_es_netwo
 {% if es_discovery is defined and es_discovery['ec2'] is defined and es_discovery['ec2']|length  %}
 discovery.seed_providers: ec2
 {% if es_discovery.ec2['group'] is defined %}
-discovery.ec2.groups: ['{{es_discovery.ec2['group']}}']
+discovery.ec2.groups: ['{{ es_discovery.ec2.group }}']
 {% else %}
 discovery.ec2.any_group: true
 {% endif %}
@@ -25,7 +25,7 @@ logger.org.elasticsearch.discovery.ec2: "TRACE"
 discovery.ec2.host_type: {{ es_discovery.ec2['host_type'] | default(default_es_discovery['host_type']) }}
 cloud.node.auto_attributes: {{ es_discovery.ec2['auto_attributes'] | default(default_es_discovery.ec2['auto_attributes']) }}
 cluster.routing.allocation.awareness.attributes: {{ es_discovery.ec2['awareness.attributes'] | default(default_es_discovery.ec2['awareness.attributes']) }}
-discovery.ec2.tag.es_cluster: {{ es_discovery.ec2['es_cluster'] | default(default_es_discovery.ec2['es_cluster']) }}
+discovery.ec2.tag.es_cluster: {{ es_discovery.ec2.es_cluster | default(default_es_discovery.ec2.es_cluster) }}
 {% if es_discovery.ec2['initial_master_nodes'] is defined and es_discovery.ec2['initial_master_nodes'] | length > 0 %}
 cluster.initial_master_nodes: {{ es_discovery.ec2['initial_master_nodes'] }}
 {% endif %}

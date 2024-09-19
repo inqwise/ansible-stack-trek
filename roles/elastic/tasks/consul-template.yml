@@ -1,0 +1,37 @@
+---
+
+- name: Ensure user consul template has write access to the config directory
+  ansible.builtin.acl:
+    path: "{{ es_config_dir }}"
+    entity: "{{ elastic_consul_template_user }}"
+    etype: user
+    permissions: rwx
+    state: present
+  tags: configuration
+
+- name: Create elastic config consul-template file
+  ansible.builtin.template:
+    src: elasticsearch.yml.ctmpl.j2
+    dest: "{{ es_config_dir }}/elasticsearch.yml.ctmpl"
+    mode: 0644
+    group: "{{ es_group }}"
+    owner: "{{ es_user }}"
+  notify: "{{ elastic_consul_template_restart_service_handler_name }}"
+  tags: configuration
+
+- name: Add elasticsearch.yml to consul-template
+  ansible.builtin.set_fact:
+    "{{ elastic_consul_template_files_var_name }}": >-
+      {{ (vars[elastic_consul_template_files_var_name] | default([])) + 
+      [es_config_dir + '/elasticsearch.yml.ctmpl'] }}
+    "{{ elastic_consul_template_templates_var_name }}": >-
+      {{ (vars[elastic_consul_template_templates_var_name] | default([])) + 
+      [{
+        'name': 'elasticsearch.yml.ctmpl',
+        'destination': es_config_dir + '/elasticsearch.yml',
+        'command': 'sudo systemctl restart elasticsearch',
+        'perms': '0664',
+        'backup': true,
+        'wait': { 'min': '2s', 'max': '10s' }
+      }] }}
+  tags: configuration
