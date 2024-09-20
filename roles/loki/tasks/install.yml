@@ -45,6 +45,7 @@
   ansible.builtin.stat:
     path: "/tmp/loki/boltdb-shipper-active"
   register: __default_structure
+  tags: installation
 
 - name: Default structure cleanup
   tags: installation
