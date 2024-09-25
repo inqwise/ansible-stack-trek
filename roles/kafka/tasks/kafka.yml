@@ -61,9 +61,9 @@
     remote_src: false
   tags: configuration
 
-- name: Recursively change owner of a {{ kafka_folder }}/home directory
+- name: Recursively change owner of a {{ kafka_folder }} directory
   ansible.builtin.file:
-    path: "{{ kafka_folder }}/home"
+    path: "{{ kafka_folder }}"
     state: directory
     recurse: yes
     group: "{{ kafka_group }}"
