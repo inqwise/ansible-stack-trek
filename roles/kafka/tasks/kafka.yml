@@ -68,6 +68,7 @@
     recurse: yes
     group: "{{ kafka_group }}"
     owner: "{{ kafka_user }}"
+  tags: configuration
 
 - name: Create kafka.service
   ansible.builtin.template:
