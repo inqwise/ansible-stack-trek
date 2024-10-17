@@ -11,3 +11,5 @@ mysql:
   root_password: "{{ mysql_root_password }}"
   datadir: "{{ mysql_datadir }}"
   stage_folder: "{{ mysql_stage_folder }}"
+
+mysql_native_password_support: "{{ mysql.native_password_support | default(false) }}"
