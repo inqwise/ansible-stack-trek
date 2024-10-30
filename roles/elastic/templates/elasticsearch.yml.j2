@@ -2,6 +2,9 @@ cluster.name: {{ es_config['cluster_name'] | default(default_ec2_cluster_name) }
 node.name: {{ es_config['node_name'] | default(ansible_hostname) }}
 node.master: {{ es_config['node_master'] | default('true') }}
 node.data: {{ es_config['node_data'] | default('true') }}
+{% if es_config.aws_availability_zone is defined %}
+node.attr.aws_availability_zone: {{ es_config.aws_availability_zone }}
+{% endif %}
 node.ingest: false
 search.remote.connect: false
 path.data: {{ es_data_dir }}
