@@ -83,8 +83,10 @@ openvpn_as_vpn_tls_refresh_interval: 360
 openvpn_as_xmlrpc_relay_level: 1
 
 openvpn_yum_repository_url: https://as-repository.openvpn.net/as-repo-amzn2.rpm
-
+openvpn_backup_bucket: "{{ backup_bucket }}"
+openvpn_backup_relative_path: "{{ private_dns }}"
 openvpn_backup_s3_path: "s3://{{ openvpn_backup_bucket }}/{{ openvpn_backup_relative_path }}"
 openvpn_backup_filename: db.zip.gpg
 
 openvpn_service_start_and_enable: "{{ 'all' in ansible_run_tags or 'configuration' in ansible_run_tags }}"
+

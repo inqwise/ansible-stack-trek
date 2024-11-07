@@ -3,5 +3,3 @@
 
 openvpn_as_download_dir: /root
 openvpn_as_service_name: openvpnas
-openvpn_backup_bucket: "{{ backup_bucket }}"
-openvpn_backup_relative_path: "{{ private_dns }}"
