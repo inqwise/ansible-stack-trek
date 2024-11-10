@@ -10,7 +10,7 @@
     src: restore-path-s3.j2
     dest: /opt/backup/openvpn-restore.sh
     mode: '100770'
-  tags: installation
+  tags: configuration
 
 - name: run restore script
   shell:

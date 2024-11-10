@@ -1,6 +1,4 @@
 ---
-- debug: var=es_discovery.ec2.es_cluster
-  tags: debug
 - debug: var=environment_name
   tags: debug
 - debug: var=discord_message_owner_name
