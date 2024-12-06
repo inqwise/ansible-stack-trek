@@ -44,6 +44,20 @@
       vars:
         ulimit:
           user: "{{ mysql.user }}"
+    
+    - name: Add or update LimitNOFILE to 65536 with spaces
+      lineinfile:
+        path: /usr/lib/systemd/system/mysqld.service
+        regexp: '^LimitNOFILE ?= ?'
+        line: 'LimitNOFILE = 65536'
+        state: present
+
+    - name: Add or update LimitNOFILE to 65536
+      lineinfile:
+        path: /usr/lib/systemd/system/mysqld.service
+        regexp: '^LimitNOFILE='
+        line: 'LimitNOFILE=65536'
+        state: present
 
 - name: config
   tags: configuration
